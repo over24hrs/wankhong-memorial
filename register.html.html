@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .card-wrap {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 2rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .brand-title { text-align: center; margin-bottom: 1.5rem; }
+    .brand-title .icon { font-size: 2.2rem; color: #1e8449; display: block; margin-bottom: 6px; }
+    .brand-title h5 { font-weight: 700; color: #145a32; margin: 0; }
+    .brand-title small { color: #7aaa88; font-size: .82rem; }
+
+    /* Step indicator */
+    .steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 1.6rem; }
+    .step-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e8efe9; color: #9aab9e;
+      font-size: .8rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .3s; flex-shrink: 0;
+    }
+    .step-dot.active { background: #1e8449; color: #fff; }
+    .step-dot.done   { background: #d4edda; color: #1a5c2e; }
+    .step-line { height: 2px; width: 60px; background: #e8efe9; transition: background .3s; }
+    .step-line.done { background: #d4edda; }
+    .step-label {
+      display: flex; justify-content: space-between;
+      font-size: .72rem; color: #9aab9e;
+      margin-top: .3rem; margin-bottom: 1.2rem; padding: 0 4px;
+    }
+
+    /* Form */
+    .form-label { font-size: .83rem; font-weight: 600; color: #3d5a45; margin-bottom: 3px; }
+    .form-control, .form-select {
+      font-size: .86rem; border-radius: 8px; border-color: #cde4d4;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #1e8449; box-shadow: 0 0 0 3px rgba(30,132,73,.15);
+    }
+    .btn-green {
+      background: linear-gradient(135deg, #1e8449, #27ae60);
+      color: #fff; border: none; border-radius: 8px;
+      font-weight: 600; padding: .55rem 1rem;
+      width: 100%; font-size: .92rem; transition: opacity .2s;
+    }
+    .btn-green:hover { opacity: .9; color: #fff; }
+    .btn-green:disabled { opacity: .6; }
+
+    /* OTP */
+    .otp-input {
+      font-size: 2rem; font-weight: 700; letter-spacing: 12px;
+      text-align: center; border-radius: 10px;
+      border: 2px solid #cde4d4; padding: .6rem; color: #145a32;
+    }
+    .otp-input:focus {
+      border-color: #1e8449; box-shadow: 0 0 0 3px rgba(30,132,73,.15); outline: none;
+    }
+
+    /* Success */
+    .success-box { text-align: center; padding: 1rem 0; }
+    .success-box .check-icon { font-size: 3.5rem; color: #1e8449; display: block; margin-bottom: .8rem; }
+
+    /* Error */
+    .error-box {
+      background: #fef2f2; border: 1.5px solid #fca5a5;
+      border-radius: 8px; padding: .75rem 1rem;
+      font-size: .83rem; color: #991b1b;
+      margin-top: .6rem; display: none;
+      align-items: flex-start; gap: 8px;
+    }
+    .error-box.show { display: flex; }
+    .error-box i { flex-shrink: 0; margin-top: 1px; font-size: 1rem; }
+
+    .msg-box { min-height: 24px; font-size: .84rem; text-align: center; margin-top: .6rem; }
+    .link-green { color: #1e8449; text-decoration: none; font-size: .84rem; }
+    .link-green:hover { text-decoration: underline; color: #145a32; }
+    .sec-div {
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #9aab9e;
+      border-bottom: 1px solid #e8efe9; padding-bottom: 4px; margin: 1rem 0 .75rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card-wrap">
+  <div class="brand-title">
+    <i class="bi bi-flower1 icon"></i>
+    <h5>สมัครสมาชิกใหม่</h5>
+    <small>ฌาปนกิจสงเคราะห์ ชุมชนแวนโค้ง</small>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="dot3"><i class="bi bi-check"></i></div>
+  </div>
+  <div class="step-label">
+    <span>กรอกข้อมูล</span>
+    <span>ยืนยัน OTP</span>
+    <span>เสร็จสิ้น</span>
+  </div>
+
+  <!-- ═══ STEP 1: กรอกข้อมูล ═══ -->
+  <div id="step1">
+    <div class="sec-div"><i class="bi bi-person me-1"></i>ข้อมูลส่วนตัว</div>
+    <div class="row g-2">
+      <div class="col-4 col-md-3">
+        <label class="form-label">คำนำหน้า</label>
+        <select class="form-select" id="reg-prefix">
+          <option>นาย</option>
+          <option>นาง</option>
+          <option>นางสาว</option>
+          <option>เด็กชาย</option>
+          <option>เด็กหญิง</option>
+        </select>
+      </div>
+      <div class="col-8 col-md-9">
+        <label class="form-label">ชื่อ <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="reg-fname" placeholder="ชื่อจริง">
+      </div>
+      <div class="col-12">
+        <label class="form-label">นามสกุล <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="reg-lname" placeholder="นามสกุล">
+      </div>
+    </div>
+
+    <div class="sec-div mt-3"><i class="bi bi-house me-1"></i>ที่อยู่</div>
+    <div class="row g-2">
+      <div class="col-6">
+        <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="reg-houseno" placeholder="เช่น 99/1">
+      </div>
+      <div class="col-6">
+        <label class="form-label">หมู่ที่</label>
+        <select class="form-select" id="reg-moo">
+          <option value="8">หมู่ 8</option>
+          <option value="9">หมู่ 9</option>
+          <option value="11">หมู่ 11</option>
+          <option value="13">หมู่ 13</option>
+          <option value="14">หมู่ 14</option>
+          <option value="16">หมู่ 16</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec-div mt-3"><i class="bi bi-lock me-1"></i>ข้อมูลเข้าสู่ระบบ</div>
+    <div class="row g-2">
+      <div class="col-12">
+        <label class="form-label">อีเมล <span class="text-danger">*</span></label>
+        <input type="email" class="form-control" id="reg-email" placeholder="example@email.com">
+      </div>
+      <div class="col-12">
+        <label class="form-label">รหัสผ่าน <span class="text-danger">*</span></label>
+        <div style="position:relative;">
+          <input type="password" class="form-control" id="reg-password" placeholder="อย่างน้อย 6 ตัวอักษร">
+          <i class="bi bi-eye" onclick="togglePass('reg-password',this)"
+            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#9aab9e;"></i>
+        </div>
+      </div>
+      <div class="col-12">
+        <label class="form-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
+        <div style="position:relative;">
+          <input type="password" class="form-control" id="reg-confirm" placeholder="กรอกซ้ำอีกครั้ง">
+          <i class="bi bi-eye" onclick="togglePass('reg-confirm',this)"
+            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#9aab9e;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error box — แสดงเฉพาะเมื่อเกิดข้อผิดพลาด -->
+    <div class="error-box" id="err-box">
+      <i class="bi bi-x-octagon-fill"></i>
+      <span id="err-text"></span>
+    </div>
+
+    <div class="msg-box" id="msg1"></div>
+
+    <button class="btn-green mt-3" id="btn-register" onclick="doRegister()">
+      <i class="bi bi-send me-1"></i>สมัครสมาชิก
+    </button>
+    <div class="text-center mt-3">
+      <a href="index.html" class="link-green">
+        <i class="bi bi-arrow-left me-1"></i>มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2: ยืนยัน OTP ═══ -->
+  <div id="step2" style="display:none;">
+    <div class="text-center mb-3">
+      <i class="bi bi-envelope-check" style="font-size:2.5rem;color:#1e8449;display:block;margin-bottom:8px;"></i>
+      <div style="font-size:.95rem;font-weight:700;color:#145a32;">ตรวจสอบอีเมลของคุณ</div>
+      <div style="font-size:.83rem;color:#7aaa88;margin-top:4px;">
+        ส่งรหัส OTP 6 หลัก ไปยัง<br>
+        <strong id="otp-email-display" style="color:#145a32;"></strong>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label text-center d-block">กรอกรหัส OTP</label>
+      <input type="text" class="form-control otp-input" id="otp-input"
+        maxlength="6" inputmode="numeric" placeholder="______"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    </div>
+    <div class="msg-box" id="msg2"></div>
+    <button class="btn-green mt-2" id="btn-verify" onclick="doVerifyOTP()">
+      <i class="bi bi-shield-check me-1"></i>ยืนยัน OTP
+    </button>
+    <div class="text-center mt-3">
+      <span style="font-size:.82rem;color:#9aab9e;">ไม่ได้รับรหัส? </span>
+      <a href="#" class="link-green" onclick="doResend()">ส่งใหม่</a>
+    </div>
+    <div class="text-center mt-2">
+      <a href="#" class="link-green" onclick="backToStep1()">
+        <i class="bi bi-arrow-left me-1"></i>แก้ไขข้อมูล
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: สำเร็จ ═══ -->
+  <div id="step3" style="display:none;">
+    <div class="success-box">
+      <i class="bi bi-check-circle-fill check-icon"></i>
+      <h5 style="font-weight:700;color:#145a32;">สมัครสมาชิกสำเร็จ!</h5>
+      <p style="color:#7aaa88;font-size:.88rem;">
+        ยืนยันตัวตนเรียบร้อยแล้ว<br>กำลังพาไปหน้าเข้าสู่ระบบ...
+      </p>
+      <div class="spinner-border spinner-border-sm text-success mt-2" role="status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  var registeredEmail = '';
+  var LOGIN_URL = 'index.html';
+
+  /* ════════ UTILS ════════ */
+  function togglePass(id, icon) {
+    var el = document.getElementById(id);
+    if (el.type === 'password') {
+      el.type = 'text';
+      icon.className = icon.className.replace('bi-eye','bi-eye-slash');
+    } else {
+      el.type = 'password';
+      icon.className = icon.className.replace('bi-eye-slash','bi-eye');
+    }
+  }
+  function setMsg(boxId, html) { document.getElementById(boxId).innerHTML = html; }
+  function showError(msg) {
+    document.getElementById('err-text').innerText = msg;
+    document.getElementById('err-box').classList.add('show');
+  }
+  function hideError() { document.getElementById('err-box').classList.remove('show'); }
+
+  function setStep(n) {
+    document.getElementById('step1').style.display = n === 1 ? 'block' : 'none';
+    document.getElementById('step2').style.display = n === 2 ? 'block' : 'none';
+    document.getElementById('step3').style.display = n === 3 ? 'block' : 'none';
+    for (var i = 1; i <= 3; i++) {
+      var dot = document.getElementById('dot' + i);
+      dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+      if (i < n) dot.innerHTML = '<i class="bi bi-check"></i>';
+      else dot.innerHTML = i === 3 ? '<i class="bi bi-check"></i>' : String(i);
+    }
+    document.getElementById('line1').className = 'step-line' + (n > 1 ? ' done' : '');
+    document.getElementById('line2').className = 'step-line' + (n > 2 ? ' done' : '');
+  }
+
+  function goToLogin() {
+    try { window.top.location.replace(LOGIN_URL); } catch(e) {
+      window.location.href = LOGIN_URL;
+    }
+  }
+
+  /* ════════ VALIDATION ════════ */
+  function validateForm() {
+    var prefix  = document.getElementById('reg-prefix').value;
+    var fname   = document.getElementById('reg-fname').value.trim();
+    var lname   = document.getElementById('reg-lname').value.trim();
+    var houseno = document.getElementById('reg-houseno').value.trim();
+    var moo     = document.getElementById('reg-moo').value;
+    var email   = document.getElementById('reg-email').value.trim();
+    var pass    = document.getElementById('reg-password').value;
+    var confirm = document.getElementById('reg-confirm').value;
+
+    if (!fname || !lname || !houseno || !email || !pass) {
+      showError('กรุณากรอกข้อมูลที่จำเป็น (*) ให้ครบ');
+      return null;
+    }
+    if (pass.length < 6) {
+      showError('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
+      return null;
+    }
+    if (pass !== confirm) {
+      showError('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+      return null;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('รูปแบบอีเมลไม่ถูกต้อง');
+      return null;
+    }
+    return { email:email, password:pass, prefix:prefix, fname:fname, lname:lname, houseNo:houseno, moo:moo };
+  }
+
+  /* ════════ STEP 1: สมัคร ════════ */
+  function doRegister() {
+    hideError();
+    setMsg('msg1', '');
+
+    var data = validateForm();
+    if (!data) return;
+
+    var btn = document.getElementById('btn-register');
+    btn.disabled = true;
+    setMsg('msg1', '<span class="text-primary"><span class="spinner-border spinner-border-sm"></span> กำลังดำเนินการ...</span>');
+
+    // ════ เปลี่ยน google.script.run → api_registerUser ════
+    api_registerUser(data)
+      .then(function(res) {
+        if (res.success) {
+          registeredEmail = data.email;
+          document.getElementById('otp-email-display').innerText = data.email;
+          setStep(2);
+          setMsg('msg2', '');
+        } else {
+          showError(res.message);
+          setMsg('msg1', '');
+          btn.disabled = false;
+        }
+      })
+      .catch(function(err) {
+        showError('เกิดข้อผิดพลาด: ' + err.message);
+        setMsg('msg1', '');
+        btn.disabled = false;
+      });
+    // ════ จบส่วนที่เปลี่ยน ════
+  }
+
+  function backToStep1() {
+    setStep(1);
+    setMsg('msg1', '');
+    hideError();
+    document.getElementById('btn-register').disabled = false;
+  }
+
+  /* ════════ STEP 2: OTP ════════ */
+  function doVerifyOTP() {
+    var otp = document.getElementById('otp-input').value.trim();
+    var btn = document.getElementById('btn-verify');
+    if (otp.length !== 6) { setMsg('msg2', '<span class="text-danger">กรุณากรอกรหัส OTP 6 หลัก</span>'); return; }
+    if (!registeredEmail) { setMsg('msg2', '<span class="text-danger">ไม่พบข้อมูลอีเมล กรุณากลับไปสมัครใหม่</span>'); return; }
+    setMsg('msg2', '<span class="text-primary"><span class="spinner-border spinner-border-sm"></span> กำลังตรวจสอบ...</span>');
+    btn.disabled = true;
+    // ════ เปลี่ยน google.script.run → api_verifyOTP ════
+    api_verifyOTP(registeredEmail, otp)
+      .then(function(res) {
+        if (res.success) {
+          setStep(3);
+          setTimeout(goToLogin, 2000);
+        } else {
+          setMsg('msg2', '<span class="text-danger">' + res.message + '</span>');
+          btn.disabled = false;
+        }
+      })
+      .catch(function(err) {
+        setMsg('msg2', '<span class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</span>');
+        btn.disabled = false;
+      });
+    // ════ จบส่วนที่เปลี่ยน ════
+  }
+
+  function doResend() {
+    setMsg('msg2', '<span class="text-warning">กรุณากลับไปสมัครสมาชิกใหม่เพื่อรับ OTP ใหม่</span>');
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('otp-input').addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') doVerifyOTP();
+    });
+  });
+</script>
+</body>
+</html>

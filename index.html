@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      padding: 2.2rem 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .brand-icon {
+      font-size: 2.5rem;
+      color: #1e8449;
+      display: block;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    h5 {
+      text-align: center;
+      font-weight: 700;
+      color: #145a32;
+      margin-bottom: 2px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: .8rem;
+      color: #7aaa88;
+      margin-bottom: 1.6rem;
+    }
+    .form-label { font-size: .83rem; font-weight: 600; color: #3d5a45; margin-bottom: 3px; }
+    .form-control {
+      font-size: .88rem;
+      border-radius: 8px;
+      border-color: #c8e0ce;
+    }
+    .form-control:focus {
+      border-color: #1e8449;
+      box-shadow: 0 0 0 3px rgba(30,132,73,.15);
+    }
+    .pass-wrap { position: relative; }
+    .pass-wrap .toggle-eye {
+      position: absolute; right: 11px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer; color: #9aab9e; font-size: .95rem;
+    }
+    .btn-login {
+      background: linear-gradient(135deg, #145a32, #1e8449);
+      color: #fff; border: none; border-radius: 8px;
+      font-weight: 600; font-size: .92rem;
+      padding: .58rem 1rem; width: 100%;
+      transition: opacity .2s; cursor: pointer;
+    }
+    .btn-login:hover { opacity: .9; }
+    .btn-login:disabled { opacity: .6; cursor: not-allowed; }
+    .msg-box {
+      min-height: 22px; font-size: .82rem;
+      text-align: center; margin-top: .6rem;
+    }
+    .register-link {
+      text-align: center; margin-top: 1.1rem;
+      font-size: .82rem; color: #9aab9e;
+    }
+    .register-link a { color: #1e8449; text-decoration: none; font-weight: 600; }
+    .register-link a:hover { text-decoration: underline; }
+    .divider {
+      border: none; border-top: 1px solid #e8efe9;
+      margin: 1.3rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <i class="bi bi-flower1 brand-icon"></i>
+  <h5>ฌาปนกิจสงเคราะห์</h5>
+  <div class="subtitle">ชุมชนแวนโค้ง — เข้าสู่ระบบ</div>
+
+  <div class="mb-3">
+    <label class="form-label">อีเมล</label>
+    <input type="email" class="form-control" id="email"
+      placeholder="example@email.com"
+      autocomplete="username email"
+      inputmode="email">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">รหัสผ่าน</label>
+    <div class="pass-wrap">
+      <input type="password" class="form-control" id="password"
+        placeholder="รหัสผ่าน" autocomplete="current-password">
+      <i class="bi bi-eye toggle-eye" id="toggle-eye" onclick="togglePass()"></i>
+    </div>
+  </div>
+
+  <!-- ✅ เพิ่ม: จดจำข้อมูล -->
+  <div class="mb-3 d-flex align-items-center gap-2" style="font-size:.83rem;color:#6b7f72;">
+    <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:#1e8449;cursor:pointer;">
+    <label for="remember-me" style="cursor:pointer;margin:0;">จดจำการเข้าสู่ระบบ</label>
+  </div>
+
+  <button class="btn-login" id="btn-login" onclick="doLogin()">
+    <i class="bi bi-box-arrow-in-right me-1"></i>เข้าสู่ระบบ
+  </button>
+
+  <div class="msg-box" id="msg"></div>
+
+  <hr class="divider">
+
+  <div class="register-link">
+    ยังไม่มีบัญชี?
+    <a href="<?= ScriptApp.getService().getUrl() ?>?page=Register">สมัครสมาชิกใหม่</a>
+  </div>
+</div>
+
+<script>
+  var BASE_URL = '<?= ScriptApp.getService().getUrl() ?>';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // ✅ โหลดข้อมูลที่จำไว้
+    try {
+      var savedEmail = localStorage.getItem('wk_email');
+      var savedPass  = localStorage.getItem('wk_pass');
+      var savedRem   = localStorage.getItem('wk_remember');
+      if (savedRem === '1' && savedEmail) {
+        document.getElementById('email').value    = savedEmail;
+        document.getElementById('password').value = savedPass || '';
+        document.getElementById('remember-me').checked = true;
+      }
+    } catch(e) {}
+
+    document.getElementById('password').addEventListener('keyup', function(e){
+      if(e.key === 'Enter') doLogin();
+    });
+    document.getElementById('email').addEventListener('keyup', function(e){
+      if(e.key === 'Enter') document.getElementById('password').focus();
+    });
+  });
+
+  function togglePass(){
+    var el  = document.getElementById('password');
+    var eye = document.getElementById('toggle-eye');
+    if(el.type === 'password'){
+      el.type = 'text';
+      eye.className = 'bi bi-eye-slash toggle-eye';
+    } else {
+      el.type = 'password';
+      eye.className = 'bi bi-eye toggle-eye';
+    }
+  }
+
+  function doLogin(){
+    var email = document.getElementById('email').value.trim();
+    var pass  = document.getElementById('password').value;
+    var msg   = document.getElementById('msg');
+    var btn   = document.getElementById('btn-login');
+    var rem   = document.getElementById('remember-me').checked;
+
+    if(!email || !pass){
+      msg.innerHTML = '<span class="text-danger">กรุณากรอกอีเมลและรหัสผ่าน</span>';
+      return;
+    }
+
+    msg.innerHTML = '<span class="text-primary"><span class="spinner-border spinner-border-sm"></span> กำลังตรวจสอบ...</span>';
+    btn.disabled  = true;
+
+    // ════ เปลี่ยนจาก google.script.run เป็น api_verifyLogin ════
+    api_verifyLogin(email, pass)
+      .then(function(res) {
+        // res คือ data จาก _apiOk(verifyLogin(...))
+        // โครงสร้างเหมือนเดิม: { success, message, role }
+        if(res.success){
+          try {
+            if(rem){
+              localStorage.setItem('wk_email',    email);
+              localStorage.setItem('wk_pass',     pass);
+              localStorage.setItem('wk_remember', '1');
+            } else {
+              localStorage.removeItem('wk_email');
+              localStorage.removeItem('wk_pass');
+              localStorage.removeItem('wk_remember');
+            }
+          } catch(e) {}
+
+          msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>เข้าสู่ระบบสำเร็จ กำลังนำไป...</span>';
+          var role = res.role || 'Member';
+          // ── GitHub Pages ใช้ path แทน GAS URL ──
+          var url = 'dashboard.html?role=' + encodeURIComponent(role);
+          setTimeout(function(){
+            try { window.top.location.href = url; }
+            catch(e) { window.location.href = url; }
+          }, 400);
+        } else {
+          msg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + res.message + '</span>';
+          btn.disabled  = false;
+        }
+      })
+      .catch(function(err) {
+        msg.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</span>';
+        btn.disabled  = false;
+      });
+    // ════ จบส่วนที่เปลี่ยน ════
+}
+
+    // แบบ async/await
+async function doLogin() {
+  try {
+    const res = await API.login(email, pass);
+    if (res.success) {
+      // handle success
+    }
+  } catch(err) {
+    // handle error
+  }
+}
+
+// แบบ Promise (ถ้าไม่อยากใช้ async/await)
+API.login(email, pass)
+  .then(res => {
+    if (res.success) { ... }
+  })
+  .catch(err => { ... });
+  }
+</script>
+<script src="js/api.js"></script>
+</body>
+</html>
