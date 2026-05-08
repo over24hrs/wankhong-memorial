@@ -128,10 +128,8 @@
 </div>
 
 <script>
-  var BASE_URL = '<?= ScriptApp.getService().getUrl() ?>';
-
   document.addEventListener('DOMContentLoaded', function(){
-    // ✅ โหลดข้อมูลที่จำไว้
+    // โหลดข้อมูลที่จำไว้
     try {
       var savedEmail = localStorage.getItem('wk_email');
       var savedPass  = localStorage.getItem('wk_pass');
@@ -163,7 +161,7 @@
     }
   }
 
-  function doLogin(){
+  async function doLogin(){
     var email = document.getElementById('email').value.trim();
     var pass  = document.getElementById('password').value;
     var msg   = document.getElementById('msg');
@@ -178,62 +176,35 @@
     msg.innerHTML = '<span class="text-primary"><span class="spinner-border spinner-border-sm"></span> กำลังตรวจสอบ...</span>';
     btn.disabled  = true;
 
-    // ════ เปลี่ยนจาก google.script.run เป็น api_verifyLogin ════
-    api_verifyLogin(email, pass)
-      .then(function(res) {
-        // res คือ data จาก _apiOk(verifyLogin(...))
-        // โครงสร้างเหมือนเดิม: { success, message, role }
-        if(res.success){
-          try {
-            if(rem){
-              localStorage.setItem('wk_email',    email);
-              localStorage.setItem('wk_pass',     pass);
-              localStorage.setItem('wk_remember', '1');
-            } else {
-              localStorage.removeItem('wk_email');
-              localStorage.removeItem('wk_pass');
-              localStorage.removeItem('wk_remember');
-            }
-          } catch(e) {}
+    try {
+      const res = await API.login(email, pass);
+      if(res.success){
+        try {
+          if(rem){
+            localStorage.setItem('wk_email',    email);
+            localStorage.setItem('wk_pass',     pass);
+            localStorage.setItem('wk_remember', '1');
+          } else {
+            localStorage.removeItem('wk_email');
+            localStorage.removeItem('wk_pass');
+            localStorage.removeItem('wk_remember');
+          }
+        } catch(e) {}
 
-          msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>เข้าสู่ระบบสำเร็จ กำลังนำไป...</span>';
-          var role = res.role || 'Member';
-          // ── GitHub Pages ใช้ path แทน GAS URL ──
-          var url = 'dashboard.html?role=' + encodeURIComponent(role);
-          setTimeout(function(){
-            try { window.top.location.href = url; }
-            catch(e) { window.location.href = url; }
-          }, 400);
-        } else {
-          msg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + res.message + '</span>';
-          btn.disabled  = false;
-        }
-      })
-      .catch(function(err) {
-        msg.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</span>';
+        msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>เข้าสู่ระบบสำเร็จ กำลังนำไป...</span>';
+        var role = res.role || 'Member';
+        var url  = 'dashboard.html?role=' + encodeURIComponent(role);
+        setTimeout(function(){
+          window.location.href = url;
+        }, 400);
+      } else {
+        msg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + res.message + '</span>';
         btn.disabled  = false;
-      });
-    // ════ จบส่วนที่เปลี่ยน ════
-}
-
-    // แบบ async/await
-async function doLogin() {
-  try {
-    const res = await API.login(email, pass);
-    if (res.success) {
-      // handle success
+      }
+    } catch(err) {
+      msg.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาด: ' + (err.message || err) + '</span>';
+      btn.disabled  = false;
     }
-  } catch(err) {
-    // handle error
-  }
-}
-
-// แบบ Promise (ถ้าไม่อยากใช้ async/await)
-API.login(email, pass)
-  .then(res => {
-    if (res.success) { ... }
-  })
-  .catch(err => { ... });
   }
 </script>
 <script src="js/api.js"></script>
