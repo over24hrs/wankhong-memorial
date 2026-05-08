@@ -1,227 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .login-card {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      padding: 2.2rem 2rem;
-      width: 100%;
-      max-width: 400px;
-    }
-    .brand-icon {
-      font-size: 2.5rem;
-      color: #1e8449;
-      display: block;
-      text-align: center;
-      margin-bottom: 6px;
-    }
-    h5 {
-      text-align: center;
-      font-weight: 700;
-      color: #145a32;
-      margin-bottom: 2px;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: .8rem;
-      color: #7aaa88;
-      margin-bottom: 1.6rem;
-    }
-    .form-label { font-size: .83rem; font-weight: 600; color: #3d5a45; margin-bottom: 3px; }
-    .form-control {
-      font-size: .88rem;
-      border-radius: 8px;
-      border-color: #c8e0ce;
-    }
-    .form-control:focus {
-      border-color: #1e8449;
-      box-shadow: 0 0 0 3px rgba(30,132,73,.15);
-    }
-    .pass-wrap { position: relative; }
-    .pass-wrap .toggle-eye {
-      position: absolute; right: 11px; top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer; color: #9aab9e; font-size: .95rem;
-    }
-    .btn-login {
-      background: linear-gradient(135deg, #145a32, #1e8449);
-      color: #fff; border: none; border-radius: 8px;
-      font-weight: 600; font-size: .92rem;
-      padding: .58rem 1rem; width: 100%;
-      transition: opacity .2s; cursor: pointer;
-    }
-    .btn-login:hover { opacity: .9; }
-    .btn-login:disabled { opacity: .6; cursor: not-allowed; }
-    .msg-box {
-      min-height: 22px; font-size: .82rem;
-      text-align: center; margin-top: .6rem;
-    }
-    .register-link {
-      text-align: center; margin-top: 1.1rem;
-      font-size: .82rem; color: #9aab9e;
-    }
-    .register-link a { color: #1e8449; text-decoration: none; font-weight: 600; }
-    .register-link a:hover { text-decoration: underline; }
-    .divider {
-      border: none; border-top: 1px solid #e8efe9;
-      margin: 1.3rem 0;
-    }
-  </style>
-</head>
-<body>
-
-<div class="login-card">
-  <i class="bi bi-flower1 brand-icon"></i>
-  <h5>ฌาปนกิจสงเคราะห์</h5>
-  <div class="subtitle">ชุมชนแวนโค้ง — เข้าสู่ระบบ</div>
-
-  <div class="mb-3">
-    <label class="form-label">อีเมล</label>
-    <input type="email" class="form-control" id="email"
-      placeholder="example@email.com"
-      autocomplete="username email"
-      inputmode="email">
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">รหัสผ่าน</label>
-    <div class="pass-wrap">
-      <input type="password" class="form-control" id="password"
-        placeholder="รหัสผ่าน" autocomplete="current-password">
-      <i class="bi bi-eye toggle-eye" id="toggle-eye" onclick="togglePass()"></i>
-    </div>
-  </div>
-
-  <div class="mb-3 d-flex align-items-center gap-2" style="font-size:.83rem;color:#6b7f72;">
-    <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:#1e8449;cursor:pointer;">
-    <label for="remember-me" style="cursor:pointer;margin:0;">จดจำการเข้าสู่ระบบ</label>
-  </div>
-
-  <button class="btn-login" id="btn-login" onclick="doLogin()">
-    <i class="bi bi-box-arrow-in-right me-1"></i>เข้าสู่ระบบ
-  </button>
-
-  <div class="msg-box" id="msg"></div>
-
-  <hr class="divider">
-
-  <div class="register-link">
-    ยังไม่มีบัญชี?
-    <a href="register.html">สมัครสมาชิกใหม่</a>
-  </div>
-</div>
-
 <!-- ========================================================
-     API (inline — ไม่ต้องพึ่งไฟล์ภายนอก)
-     ======================================================== -->
-<script>
-const API = {
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbwTLUe8v-BvVNU9njmzf_n7Dt-mKgxOEWobZmLFoXBY8kgyIbe3QTR1uKIOHepGqyaQjg/exec',
+       API (inline — ไม่ต้องพึ่งไฟล์ภายนอก)
+       ======================================================== -->
+  <script>
+  const API = {
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbxypGlbJfSzrHgqMB4GRjin6E80glV9Q6AckgzuRhSN9pcz1BlQlJfiVZMy7yfixwi2sg/exec',
 
-  // ── JSONP — แก้ CORS สำหรับ GET / login ──
-  _jsonp(params) {
-    return new Promise((resolve, reject) => {
-      const cb    = '_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      const timer = setTimeout(() => {
-        delete window[cb];
-        document.getElementById(cb) && document.getElementById(cb).remove();
-        reject(new Error('หมดเวลาเชื่อมต่อ (15s)'));
-      }, 15000);
+    // ── GET via fetch (echo URL มี Access-Control-Allow-Origin: * จึงไม่ต้องใช้ JSONP) ──
+    async _get(params) {
+      const qs  = new URLSearchParams(params).toString();
+      const res = await fetch(this.BASE_URL + '?' + qs, { redirect: 'follow' });
+      if (!res.ok) throw new Error('เชื่อมต่อ server ไม่ได้ (HTTP ' + res.status + ')');
+      const data = await res.json();
+      if (data && data.success === false) {
+        throw new Error(data.error || data.message || 'เกิดข้อผิดพลาด');
+      }
+      return data && data.data !== undefined ? data.data : data;
+    },
 
-      window[cb] = (data) => {
-        clearTimeout(timer);
-        delete window[cb];
-        document.getElementById(cb) && document.getElementById(cb).remove();
-        // รองรับทั้ง { success, data } และ { success, message, role }
-        if (data && data.success === false) {
-          reject(new Error(data.error || data.message || 'เกิดข้อผิดพลาด'));
-        } else {
-          resolve(data && data.data !== undefined ? data.data : data);
-        }
-      };
+    // ── POST via fetch ──
+    async _post(action, body) {
+      body = body || {};
+      const res = await fetch(this.BASE_URL, {
+        method:   'POST',
+        headers:  { 'Content-Type': 'text/plain' },
+        body:     JSON.stringify(Object.assign({ action: action }, body)),
+        redirect: 'follow'
+      });
+      if (!res.ok) throw new Error('เชื่อมต่อ server ไม่ได้ (HTTP ' + res.status + ')');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || json.message || 'เกิดข้อผิดพลาด');
+      return json.data !== undefined ? json.data : json;
+    },
 
-      const qs = new URLSearchParams(Object.assign({}, params, { callback: cb })).toString();
-      const s  = document.createElement('script');
-      s.id     = cb;
-      s.src    = this.BASE_URL + '?' + qs;
-      s.onerror = () => {
-        clearTimeout(timer);
-        delete window[cb];
-        s.remove();
-        reject(new Error('เชื่อมต่อ server ไม่ได้'));
-      };
-      document.head.appendChild(s);
-    });
-  },
-
-  // ── POST — สำหรับ action ที่ส่งข้อมูลเยอะ ──
-  async _post(action, body) {
-    body = body || {};
-    const res = await fetch(this.BASE_URL, {
-      method:   'POST',
-      headers:  { 'Content-Type': 'text/plain' },
-      body:     JSON.stringify(Object.assign({ action: action }, body)),
-      redirect: 'follow'
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || json.message || 'เกิดข้อผิดพลาด');
-    return json.data !== undefined ? json.data : json;
-  },
-
-  // ════ AUTH ════
-  login:     function(email, password) { return API._jsonp({ action: 'login', email: email, password: password }); },
-  verifyOTP: function(email, otp)      { return API._jsonp({ action: 'verifyOTP', email: email, otp: otp }); },
-  register:  function(userData)        { return API._post('register', { userData: userData }); },
-
-  // ════ MEMBERS ════
-  getMembers:         function()     { return API._jsonp({ action: 'getMembers' }); },
-  saveMember:         function(data) { return API._post('saveMember', { data: data }); },
-  updateMemberStatus: function(data) { return API._post('updateMemberStatus', { data: data }); },
-  saveMemberMovement: function(data) { return API._post('saveMemberMovement', { data: data }); },
-  checkDuplicate: function(fname, lname, houseno, moo, editingId, idcard) {
-    return API._post('checkDuplicate', { fname: fname, lname: lname, houseno: houseno, moo: moo, editingId: editingId, idcard: idcard });
-  },
-
-  // ════ DASHBOARD ════
-  getDashboardStats:  function() { return API._jsonp({ action: 'getDashboardStats' }); },
-  getMemberMovements: function() { return API._jsonp({ action: 'getMemberMovements' }); },
-
-  // ════ FINANCE ════
-  getAllFinanceData:      function()      { return API._jsonp({ action: 'getFinance' }); },
-  saveFinance:           function(data)  { return API._post('saveFinance', { data: data }); },
-  deleteFinance:         function(txnId) { return API._post('deleteFinance', { txnId: txnId }); },
-  saveBankTransaction:   function(data)  { return API._post('saveBankTransaction', { data: data }); },
-  deleteBankTransaction: function(txnId) { return API._post('deleteBankTransaction', { txnId: txnId }); },
-  saveTransfer:          function(data)  { return API._post('saveTransfer', { data: data }); },
-  deleteTransfer:        function(id)    { return API._post('deleteTransfer', { transferId: id }); },
-  uploadSlip: function(base64Data, mimeType, fileName, txnId) {
-    return API._post('uploadSlip', { base64Data: base64Data, mimeType: mimeType, fileName: fileName, txnId: txnId });
-  },
-
-  // ════ ANNUAL ════
-  getAnnualSummary:     function()     { return API._jsonp({ action: 'getAnnualSummary' }); },
-  saveAnnualNewMembers: function(data) { return API._post('saveAnnualNewMembers', { data: data }); },
-  saveAnnualDeaths:     function(data) { return API._post('saveAnnualDeaths', { data: data }); },
-  updateAnnualRecord:   function(data) { return API._post('updateAnnualRecord', { data: data }); },
-  deleteAnnualRecord:   function(id)   { return API._post('deleteAnnualRecord', { id: id }); }
-};
-</script>
+    login:     function(email, password) { return API._get({ action: 'login', email: email, password: password }); },
+    verifyOTP: function(email, otp)      { return API._get({ action: 'verifyOTP', email: email, otp: otp }); },
+    register:  function(userData)        { return API._post('register', { userData: userData }); }
+  };
+  </script>
 
 <!-- ========================================================
      LOGIN LOGIC
