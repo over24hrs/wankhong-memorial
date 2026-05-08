@@ -5,7 +5,7 @@
 
 const API = {
   // ── ตั้งค่า ──
-  BASE_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbwMlkGgnFg0R8w0YcfQN2L_2bc0prq9urtWijhednbkv8rFyZeBxYBGHPN9rqlY9HRfMw/exec',
   TOKEN: '',  // ถ้าตั้ง API_SECRET ไว้ใน GAS Properties
   
   // ── GET request ──
