@@ -93,3 +93,20 @@ const API = {
   updateAnnualRecord:   function(data) { return API._post('updateAnnualRecord', { data: data }); },
   deleteAnnualRecord:   function(id)   { return API._post('deleteAnnualRecord', { id: id }); }
 };
+// เพิ่มใน api.js หรือก่อน </script> ของแต่ละหน้า
+function api_getAllFinanceData()     { return API.getAllFinanceData(); }
+function api_getMembers()            { return API.getMembers(); }
+function api_getAnnualSummary()      { return API.getAnnualSummary(); }
+function api_saveMember(data)        { return API.saveMember(data); }
+function api_updateMemberStatus(data){ return API.updateMemberStatus(data); }
+function api_saveMemberMovement(data){ return API.saveMemberMovement(data); }
+function api_saveFinanceV2(data)     { return API.saveFinance(data); }
+function api_saveBankTransaction(data){ return API.saveBankTransaction(data); }
+function api_saveTransfer(data)      { return API.saveTransfer(data); }
+function api_deleteFinance(id)       { return API.deleteFinance(id); }
+function api_deleteBankTransaction(id){ return API.deleteBankTransaction(id); }
+function api_deleteTransfer(id)      { return API.deleteTransfer(id); }
+function api_saveAnnualNewMembers(d) { return API.saveAnnualNewMembers(d); }
+function api_registerUser(data)      { return API.register(data); }
+function api_verifyOTP(email, otp)   { return API.verifyOTP(email, otp); }
+function api_uploadSlipToDrive(b64, mime, name, txnId) { return API.uploadSlip(b64, mime, name, txnId); }
