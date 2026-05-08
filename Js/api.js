@@ -3,7 +3,7 @@
 // ════════════════════════════════════════════════
 
 const API = {
-  BASE_URL: 'https://script.google.com/macros/s/AKfycbxmCprVYm2pvaF6uNPhvHvJfZjtZAj7ZBQRYE4XKwJBAW-RrBa6SofWP0Emm5UD9TSaig/exec',
+  BASE_URL: 'https://script.google.com/macros/s/AKfycbxP51cKcuFGbH-oAWa837hDvnYF8s1gVNaWfmV3y32cENI9ntC4dFRM5xCc3PU8pySh5w/exec',
 
   // ── JSONP (แก้ CORS สำหรับ GET) ──
   _jsonp(params) {
