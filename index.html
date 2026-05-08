@@ -122,19 +122,18 @@
   <hr class="divider">
 
   <div class="register-link">
-  ยังไม่มีบัญชี?
-  <a href="register_html.html">สมัครสมาชิกใหม่</a>
-</div>
+    ยังไม่มีบัญชี?
+    <a href="register_html.html">สมัครสมาชิกใหม่</a>
+  </div>
 </div>
 
+<script src="js/api.js"></script>  <!-- โหลดก่อน! -->
 <script>
   document.addEventListener('DOMContentLoaded', function(){
-    // โหลดข้อมูลที่จำไว้
     try {
       var savedEmail = localStorage.getItem('wk_email');
       var savedPass  = localStorage.getItem('wk_pass');
-      var savedRem   = localStorage.getItem('wk_remember');
-      if (savedRem === '1' && savedEmail) {
+      if (localStorage.getItem('wk_remember') === '1' && savedEmail) {
         document.getElementById('email').value    = savedEmail;
         document.getElementById('password').value = savedPass || '';
         document.getElementById('remember-me').checked = true;
@@ -153,11 +152,9 @@
     var el  = document.getElementById('password');
     var eye = document.getElementById('toggle-eye');
     if(el.type === 'password'){
-      el.type = 'text';
-      eye.className = 'bi bi-eye-slash toggle-eye';
+      el.type = 'text'; eye.className = 'bi bi-eye-slash toggle-eye';
     } else {
-      el.type = 'password';
-      eye.className = 'bi bi-eye toggle-eye';
+      el.type = 'password'; eye.className = 'bi bi-eye toggle-eye';
     }
   }
 
@@ -190,25 +187,18 @@
             localStorage.removeItem('wk_remember');
           }
         } catch(e) {}
-
-        msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>เข้าสู่ระบบสำเร็จ กำลังนำไป...</span>';
+        msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>เข้าสู่ระบบสำเร็จ...</span>';
         var role = res.role || 'Member';
-        var url  = 'dashboard.html?role=' + encodeURIComponent(role);
-        setTimeout(function(){
-          window.location.href = url;
-        }, 400);
+        setTimeout(() => { window.location.href = 'dashboard.html?role=' + encodeURIComponent(role); }, 400);
       } else {
-        msg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + res.message + '</span>';
+        msg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>' + (res.message || 'ข้อมูลไม่ถูกต้อง') + '</span>';
         btn.disabled  = false;
       }
     } catch(err) {
-      msg.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาด: ' + (err.message || err) + '</span>';
+      msg.innerHTML = '<span class="text-danger">เกิดข้อผิดพลาด: ' + err.message + '</span>';
       btn.disabled  = false;
     }
   }
- <script src="js/api.js"></script>   ← ย้ายขึ้นมาก่อน
-<script>
-  // ... โค้ด doLogin() ...
 </script>
 </body>
 </html>
