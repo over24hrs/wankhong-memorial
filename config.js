@@ -1,5 +1,5 @@
 const CONFIG = {
-    API_URL: 'https://script.google.com/macros/s/AKfycbxypGlbJfSzrHgqMB4GRjin6E80glV9Q6AckgzuRhSN9pcz1BlQlJfiVZMy7yfixwi2sg/exec',
+    API_URL: 'https://script.google.com/macros/s/AKfycbwTLUe8v-BvVNU9njmzf_n7Dt-mKgxOEWobZmLFoXBY8kgyIbe3QTR1uKIOHepGqyaQjg/exec',
     APP_NAME: 'ระบบฌาปนกิจสงเคราะห์ ชุมชนแวนโค้ง'
   };
   
