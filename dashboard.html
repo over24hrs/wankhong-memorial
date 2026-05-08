@@ -379,8 +379,8 @@
 <body>
 
 <script>
-  var ROLE     = '<?= role ?>';
-  var BASE_URL = '<?= ScriptApp.getService().getUrl() ?>';
+  var ROLE     = new URLSearchParams(window.location.search).get('role') || 'Member';
+  var BASE_URL = '';
   var ALL = [];
   try { ALL = <?!= membersJson ?>; if (!Array.isArray(ALL)) ALL = []; } catch(e) { ALL = []; }
 </script>
@@ -1186,12 +1186,12 @@ window.onload=function(){
   var now=new Date(), thY=now.getFullYear()+543;
   document.getElementById('today-lbl').innerText=now.getDate()+' '+TM[now.getMonth()]+' '+thY;
   document.getElementById('fin-today-lbl').innerText=now.getDate()+' '+TM[now.getMonth()]+' '+thY;
-  document.getElementById('logout-btn').href=BASE_URL+'?page=Login';
+  document.getElementById('logout-btn').href='index.html';
   if(ROLE==='Admin'){
     document.getElementById('rbadge').classList.add('adm');
     document.getElementById('rtxt').innerText='Admin';
     var ab=document.getElementById('members-admin-btn'); if(ab) ab.style.display='block';
-    var ml=document.getElementById('manage-member-link'); if(ml) ml.href=BASE_URL+'?page=Members&role=Admin';
+    var ml=document.getElementById('manage-member-link'); if(ml) ml.href='members.html?role=Admin';
   } else {
     document.getElementById('rtxt').innerText='สมาชิก';
   }
@@ -1977,12 +1977,12 @@ function saveDeathCount(){
   var year=document.getElementById('admin-dead-year').value,count=parseInt(document.getElementById('admin-dead-count').value)||0,msg=document.getElementById('admin-msg');
   if(count<=0){msg.innerHTML='<span style="color:var(--danger);">กรุณากรอกจำนวน</span>';return;}
   msg.innerHTML='<span style="color:var(--primary);"><span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...</span>';
-  google.script.run.withSuccessHandler(function(res){ msg.innerHTML=res.success?'<span style="color:#059669;">✅ '+res.message+'</span>':'<span style="color:var(--danger);">'+res.message+'</span>'; if(res.success){document.getElementById('admin-dead-count').value=0;loadAdminRecords();loadAnnualSummary();showToast('บันทึกสำเร็จ!');} }).withFailureHandler(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';}).saveAnnualDeaths({year:parseInt(year),moo:'0',deaths:count,addedBy:'admin'});
+  api_saveAnnualDeaths({year:parseInt(year),moo:'0',deaths:count,addedBy:'admin'}).then(function(res){ msg.innerHTML=res.success?'<span style="color:#059669;">✅ '+res.message+'</span>':'<span style="color:var(--danger);">'+res.message+'</span>'; if(res.success){document.getElementById('admin-dead-count').value=0;loadAdminRecords();loadAnnualSummary();showToast('บันทึกสำเร็จ!');} }).catch(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';});
 }
 function loadAdminRecords(){
   var tbody=document.getElementById('admin-records-tbody'); if(!tbody)return;
   tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;"><span class="spinner-border spinner-border-sm"></span> กำลังโหลด...</td></tr>';
-  google.script.run.withSuccessHandler(function(data){ADMIN_RECORDS=data||[];renderAdminRecords();}).withFailureHandler(function(err){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:2rem;">'+err.message+'</td></tr>';}).getAnnualSummary();
+  api_getAnnualSummary().then(function(data){ADMIN_RECORDS=data||[];renderAdminRecords();}).catch(function(err){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:2rem;">'+err.message+'</td></tr>';});
 }
 function renderAdminRecords(){
   var tbody=document.getElementById('admin-records-tbody'); if(!tbody)return;
@@ -1994,8 +1994,8 @@ function renderAdminRecords(){
 }
 function openEditModal(id){ var record=ADMIN_RECORDS.find(function(r){return r.id===id;}); if(!record){showToast('ไม่พบข้อมูล',true);return;} document.getElementById('edit-record-id').value=record.id; document.getElementById('edit-year').value=record.year; document.getElementById('edit-moo-display').value=record.moo==='0'?'ไม่ระบุหมู่':'หมู่ '+record.moo+' - '+(MOO_VILLAGE_MAP[record.moo]||record.village||''); document.getElementById('edit-new-count').value=record.newMembers||0; document.getElementById('edit-fee').value=record.fee||0; document.getElementById('edit-dead-count').value=record.deaths||0; document.getElementById('edit-msg').innerHTML=''; document.getElementById('edit-annual-modal').style.display='flex'; document.body.style.overflow='hidden'; }
 function closeEditModal(){ document.getElementById('edit-annual-modal').style.display='none'; document.body.style.overflow=''; }
-function updateRecord(){ var id=document.getElementById('edit-record-id').value,newCount=parseInt(document.getElementById('edit-new-count').value)||0,fee=parseInt(document.getElementById('edit-fee').value)||0,dead=parseInt(document.getElementById('edit-dead-count').value)||0,msg=document.getElementById('edit-msg'); msg.innerHTML='<span style="color:var(--primary);"><span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...</span>'; google.script.run.withSuccessHandler(function(res){ msg.innerHTML=res.success?'<span style="color:#059669;">✅ '+res.message+'</span>':'<span style="color:var(--danger);">'+res.message+'</span>'; if(res.success){showToast('อัปเดตสำเร็จ!');setTimeout(function(){closeEditModal();loadAdminRecords();loadAnnualSummary();},800);} }).withFailureHandler(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';}).updateAnnualRecord({id:id,newMembers:newCount,fee:fee,deaths:dead}); }
-function deleteRecord(){ var id=document.getElementById('edit-record-id').value,msg=document.getElementById('edit-msg'); if(!confirm('ยืนยันการลบข้อมูลนี้?'))return; msg.innerHTML='<span style="color:var(--danger);"><span class="spinner-border spinner-border-sm"></span> กำลังลบ...</span>'; google.script.run.withSuccessHandler(function(res){ if(res.success){showToast('ลบสำเร็จ!');closeEditModal();loadAdminRecords();loadAnnualSummary();}else{msg.innerHTML='<span style="color:var(--danger);">'+res.message+'</span>';} }).withFailureHandler(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';}).deleteAnnualRecord(id); }
+function updateRecord(){ var id=document.getElementById('edit-record-id').value,newCount=parseInt(document.getElementById('edit-new-count').value)||0,fee=parseInt(document.getElementById('edit-fee').value)||0,dead=parseInt(document.getElementById('edit-dead-count').value)||0,msg=document.getElementById('edit-msg'); msg.innerHTML='<span style="color:var(--primary);"><span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...</span>'; api_updateAnnualRecord({id:id,newMembers:newCount,fee:fee,deaths:dead}).then(function(res){ msg.innerHTML=res.success?'<span style="color:#059669;">✅ '+res.message+'</span>':'<span style="color:var(--danger);">'+res.message+'</span>'; if(res.success){showToast('อัปเดตสำเร็จ!');setTimeout(function(){closeEditModal();loadAdminRecords();loadAnnualSummary();},800);} }).catch(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';});  }
+function deleteRecord(){ var id=document.getElementById('edit-record-id').value,msg=document.getElementById('edit-msg'); if(!confirm('ยืนยันการลบข้อมูลนี้?'))return; msg.innerHTML='<span style="color:var(--danger);"><span class="spinner-border spinner-border-sm"></span> กำลังลบ...</span>'; api_deleteAnnualRecord(id).then(function(res){ if(res.success){showToast('ลบสำเร็จ!');closeEditModal();loadAdminRecords();loadAnnualSummary();}else{msg.innerHTML='<span style="color:var(--danger);">'+res.message+'</span>';} }).catch(function(err){msg.innerHTML='<span style="color:var(--danger);">'+err.message+'</span>';});  }
 
 /* ════════════════════════════════════════════
    FINANCE — INIT
@@ -2083,7 +2083,7 @@ function finSelectFirstCat(){
 }
 function finSelCat(el){ el.closest('.cat-grid').querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');}); el.classList.add('active'); FIN_CAT=el.getAttribute('data-c'); }
 function finHandleSlip(evt){ var file=evt.target.files[0]; if(!file)return; FIN_SLIP_FILE=file; document.getElementById('fin-slip-area').classList.add('has-file'); document.getElementById('fin-slip-lbl').innerText=file.name; if(file.type.startsWith('image/')){var r=new FileReader(); r.onload=function(e){var img=document.getElementById('fin-slip-img'); img.src=e.target.result; img.classList.add('show');}; r.readAsDataURL(file);} }
-function finUploadSlip(file,txnId,onSuccess,onError){ var reader=new FileReader(); reader.onload=function(e){ var b64=e.target.result.split(',')[1]; google.script.run.withSuccessHandler(function(res){if(res.success)onSuccess(res.url);else onError(res.message);}).withFailureHandler(function(err){onError(err.message);}).uploadSlipToDrive(b64,file.type,file.name,txnId); }; reader.readAsDataURL(file); }
+function finUploadSlip(file,txnId,onSuccess,onError){ var reader=new FileReader(); reader.onload=function(e){ var b64=e.target.result.split(',')[1]; api_uploadSlipToDrive(b64,file.type,file.name,txnId).then(function(res){if(res.success)onSuccess(res.url);else onError(res.message);}).catch(function(err){onError(err.message);}); }; reader.readAsDataURL(file); }
 function finClearForm(){
   FIN_EDIT_ID=null; FIN_EDIT_TYPE=null; FIN_SLIP_FILE=null; FIN_SLIP_URL='';
   document.getElementById('fin-edit-bar').style.display='none';

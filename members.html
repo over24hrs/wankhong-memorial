@@ -145,8 +145,8 @@
 <body>
 
 <script>
-  var ROLE = '<?= role ?>';
-  var BASE_URL = '<?= ScriptApp.getService().getUrl() ?>';
+  var ROLE = new URLSearchParams(window.location.search).get('role') || 'Member';
+  var BASE_URL = '';
   var MOO_VILLAGE_MAP = {
     '8':'บ้านแวนโค้ง','9':'บ้านใหม่เจริญไพร','11':'บ้านสันติสุข',
     '13':'บ้านใหม่นาสา','14':'บ้านศิวิไล','16':'บ้านฐานพัฒนา'
